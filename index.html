@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EIXO · Studio de tecnologia com IA aplicada</title>
-<meta name="description" content="Studio de tecnologia e consultoria com IA aplicada. Diagnóstico, estratégia e construção sob medida para empresas que precisam decidir bem antes de implementar[...]
+<meta name="description" content="Studio de tecnologia e consultoria com IA aplicada. Diagnóstico, estratégia e construção sob medida para empresas que precisam decidir bem antes de implementar.">
 
 <!-- Open Graph -->
 <meta property="og:title" content="EIXO · Intencionalidade tecnológica">
@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://eixoai.com">
 
 <!-- Favicon SVG inline -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230A0A0A'/%3E%3Ctext x='50'[...]
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230A0A0A'/%3E%3Ctext x='50' y='72' text-anchor='middle' font-family='monospace' font-size='62' font-weight='700' fill='%23FF1493'%3EX%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" r[...]
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -62,7 +62,7 @@ body::before {
   pointer-events: none;
   z-index: 9999;
   opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves=[...]
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
 
@@ -748,7 +748,7 @@ footer a:hover { color: var(--accent); }
 <nav class="nav">
   <div class="nav-logo">[EI<span class="x">X</span>O]</div>
   <div class="nav-actions">
-    <a href="/precos.html">Preços</a> <a href="#sobre">Sobre</a>
+    <a href="#sobre">Sobre</a>
     <a href="#metodo">Método</a>
     <a href="#time">Time</a>
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">LIGHT</button>
@@ -798,9 +798,9 @@ footer a:hover { color: var(--accent); }
     <div class="sobre-text">
       <p>EIXO nasceu de uma constatação simples: a maior parte da tecnologia que chega às empresas brasileiras nasce do hype, não do problema real.</p>
 
-      <p>Somos um <em>studio de tecnologia e consultoria</em> com IA aplicada. Não vendemos licença de SaaS. Não empurramos templates. Cada projeto que entregamos é desenhado para um negócio[...]
+      <p>Somos um <em>studio de tecnologia e consultoria</em> com IA aplicada. Não vendemos licença de SaaS. Não empurramos templates. Cada projeto que entregamos é desenhado para um negócio específico — diagnosticado, decidido, construído e <em>sob medida</em>.</p>
 
-      <p>Nosso jeito de trabalhar tem origem em quem já esteve dentro do dia a dia das empresas. Antes de codar, escutamos. Antes de propor IA, perguntamos se ela é, de fato, a melhor resposta.[...]
+      <p>Nosso jeito de trabalhar tem origem em quem já esteve dentro do dia a dia das empresas. Antes de codar, escutamos. Antes de propor IA, perguntamos se ela é, de fato, a melhor resposta. Às vezes é. Às vezes uma automação simples resolve. Às vezes a tecnologia certa é a que já existe, melhor configurada. <em>A decisão importa mais que a ferramenta.</em></p>
 
       <p>É isso que chamamos de <em>intencionalidade tecnológica</em>: tecnologia que serve, não que impressiona.</p>
     </div>
@@ -998,10 +998,8 @@ function handleSubmit(e) {
 // Pausar animação quando aba está em background (economia de bateria)
 document.addEventListener('visibilitychange', () => {
   const mark = document.querySelector('.hero-mark');
-  if (document.hidden) {
-    mark.style.animationPlayState = 'paused';
-  } else {
-    mark.style.animationPlayState = 'running';
+  if (mark) {
+    mark.style.animationPlayState = document.hidden ? 'paused' : 'running';
   }
 });
 </script>
