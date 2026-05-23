@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIXO · Produtos</title>
+<meta name="description" content="Sistemas prontos para empresas que não têm tempo a perder. Tecnologia com IA aplicada, entregue sob medida.">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230A0A0A'/%3E%3Ctext x='50' y='72' text-anchor='middle' font-family='monospace' font-size='62' font-weight='700' fill='%23FF1493'%3EX%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0A0A0A;
+  --fg: #F5F2EC;
+  --muted: #6B6661;
+  --line: #1F1D1A;
+  --accent: #FF1493;
+  --accent-dim: #B30E68;
+  --paper: #F5F2EC;
+  --ink: #0A0A0A;
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+[data-theme="light"] {
+  --bg: #F5F2EC;
+  --fg: #0A0A0A;
+  --muted: #6B6661;
+  --line: #E0DCD2;
+  --accent: #D6196F;
+  --accent-dim: #9C0F4E;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Fraunces', Georgia, serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* ====== NAV ====== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 18px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  transition: background 0.4s;
+}
+[data-theme="light"] .nav { background: rgba(245, 242, 236, 0.85); }
+
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--fg);
+}
+.nav-logo .x { color: var(--accent); }
+
+.nav-actions {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.nav-actions a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-actions a:hover { color: var(--fg); }
+.nav-cta {
+  background: var(--accent);
+  color: var(--ink) !important;
+  padding: 8px 16px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.nav-cta:hover { background: var(--fg); color: var(--bg) !important; }
+
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ====== PAGE HEADER ====== */
+.page-header {
+  padding: 140px 40px 80px;
+  border-bottom: 1px solid var(--line);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: block;
+}
+
+.page-header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  max-width: 700px;
+  margin-bottom: 24px;
+}
+
+.page-header h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.page-header p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* ====== PRODUCTS GRID ====== */
+.products-section {
+  padding: 80px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.product-card {
+  border: 1px solid var(--line);
+  padding: 60px;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.4s var(--ease);
+}
+
+.product-card:hover::before { transform: scaleY(1); }
+.product-card:hover { border-color: var(--accent); background: rgba(255, 20, 147, 0.03); }
+
+.product-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.product-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  line-height: 1.1;
+}
+
+.product-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+.product-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.product-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: gap 0.2s;
+}
+.product-card:hover .product-cta { gap: 16px; }
+
+/* ====== MODAL ====== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  max-width: 860px;
+  width: 100%;
+  transform: translateY(40px);
+  transition: transform 0.4s var(--ease);
+  margin: auto;
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0);
+}
+
+.modal-header {
+  padding: 40px 48px 32px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-header-left {}
+
+.modal-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 24px;
+  margin-top: 4px;
+}
+.modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+.modal-body {
+  padding: 48px;
+}
+
+/* Video */
+.modal-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--line);
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Description */
+.modal-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.modal-description {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--fg);
+  margin-bottom: 32px;
+}
+
+.modal-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.modal-feature {
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+}
+
+.modal-feature-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.modal-feature-text {
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Planos */
+.modal-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-bottom: 48px;
+}
+
+.modal-plan {
+  padding: 32px;
+  border: 1px solid var(--line);
+}
+
+.modal-plan.featured {
+  border-color: var(--accent);
+  background: rgba(255, 20, 147, 0.04);
+}
+
+.plan-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.plan-name {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.plan-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+
+.plan-price strong {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.plan-recurrence {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.plan-divider {
+  height: 1px;
+  background: var(--line);
+  margin-bottom: 20px;
+}
+
+.plan-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-items li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.plan-items li::before {
+  content: '—';
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* CTA comprar */
+.modal-buy {
+  display: block;
+  width: 100%;
+  padding: 20px 32px;
+  background: var(--accent);
+  color: var(--ink);
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+}
+.modal-buy:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* Trial note */
+.trial-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 16px;
+  letter-spacing: 0.1em;
+}
+
+/* ====== FOOTER ====== */
+footer {
+  padding: 40px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+footer a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+footer a:hover { color: var(--accent); }
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .nav { padding: 16px 20px; }
+  .nav-actions { gap: 16px; }
+  .nav-actions a:not(.nav-cta):not([data-toggle]) { display: none; }
+  .page-header { padding: 120px 20px 60px; }
+  .products-section { padding: 40px 20px; }
+  .product-card { padding: 32px 24px; }
+  .modal-header { padding: 28px 24px 24px; }
+  .modal-body { padding: 28px 24px; }
+  .modal-features { grid-template-columns: 1fr; }
+  .modal-plans { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/index.html" class="nav-logo">EI<span class="x">X</span>O</a>
+  <div class="nav-actions">
+    <a href="/index.html#sobre">Sobre</a>
+    <a href="/index.html#metodo">Método</a>
+    <a href="/index.html#time">Time</a>
+    <button class="theme-toggle" data-toggle onclick="toggleTheme()">LIGHT</button>
+    <a href="mailto:contato@eixoai.com" class="nav-cta">Conversar →</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div style="max-width: 1200px; margin: 0 auto;">
+  <div class="page-header">
+    <span class="page-header-label">01 — Portfólio</span>
+    <h1>Sistemas prontos para <em>empresas reais.</em></h1>
+    <p>Cada produto da Eixo resolve um problema operacional específico — construído com IA, entregue como seu, adaptado ao seu contexto.</p>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-section">
+
+  <div class="product-card" onclick="openModal('frota')">
+    <span class="product-number">Produto 01</span>
+    <div class="product-name">nexi<span style="color: var(--accent)">.</span>frota</div>
+    <div class="product-tagline">Gestão de frota com rastreamento de jornada,<br>notificações automáticas via WhatsApp e painel em tempo real.</div>
+    <div class="product-tags">
+      <span class="product-tag">Gestão de frota</span>
+      <span class="product-tag">WhatsApp integrado</span>
+      <span class="product-tag">Tempo real</span>
+      <span class="product-tag">React + Supabase</span>
+      <span class="product-tag">Trial 7 dias</span>
+    </div>
+    <span class="product-cta">Ver produto →</span>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-frota" onclick="handleOverlayClick(event)">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <span class="modal-label">Produto 01 — Gestão de frota</span>
+        <div class="modal-title">nexi<span style="color: var(--accent)">.</span>frota</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('frota')">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- VIDEO -->
+      <div class="modal-video">
+        <video controls preload="metadata" poster="">
+          <source src="./WhatsApp_Video_2026-05-22_at_18_28_33.mp4" type="video/mp4">
+          Seu navegador não suporta vídeo HTML5.
+        </video>
+      </div>
+
+      <!-- DESCRIÇÃO -->
+      <span class="modal-section-label">O que é</span>
+      <div class="modal-description">
+        O nexi.frota é um sistema de gestão de frota construído para empresas que operam veículos em campo e precisam de visibilidade real sobre cada jornada — sem planilha, sem ligação, sem achismo.
+      </div>
+      <div class="modal-description" style="font-size: 16px; color: var(--muted); margin-bottom: 48px;">
+        Cada veículo percorre um fluxo de etapas configurável. A cada avanço, o sistema dispara uma notificação automática via WhatsApp para quem precisa saber. O painel em tempo real mostra onde cada veículo está no fluxo, há quanto tempo, e o que aconteceu em cada etapa.
+      </div>
+
+      <!-- FUNCIONALIDADES -->
+      <span class="modal-section-label">O que inclui</span>
+      <div class="modal-features">
+        <div class="modal-feature">
+          <span class="modal-feature-title">Fluxo por etapas</span>
+          <span class="modal-feature-text">Dois fluxos configuráveis: Frota (mob) e Serviço (svc). Cada etapa tem responsável, status e tempo registrado.</span>
+        </div>
+        <div class="modal-feature">
+          <span class="modal-feature-title">WhatsApp automático</span>
+          <span class="modal-feature-text">Notificações disparadas a cada avanço de etapa. Templates personalizáveis por tela, sem código.</span>
+        </div>
+        <div class="modal-feature">
+          <span class="modal-feature-title">Painel em tempo real</span>
+          <span class="modal-feature-text">Visão geral de toda a frota em um único painel. Filtros por status, etapa e veículo.</span>
+        </div>
+        <div class="modal-feature">
+          <span class="modal-feature-title">Gestão de usuários</span>
+          <span class="modal-feature-text">Convide membros da equipe, defina papéis e gerencie acessos direto pela tela de administração.</span>
+        </div>
+        <div class="modal-feature">
+          <span class="modal-feature-title">Banco exclusivo</span>
+          <span class="modal-feature-text">Cada cliente tem um projeto Supabase próprio. Seus dados nunca compartilhados com outros clientes.</span>
+        </div>
+        <div class="modal-feature">
+          <span class="modal-feature-title">White label</span>
+          <span class="modal-feature-text">Logo e nome da sua empresa na tela de login e no sistema. Parece que foi feito para você — porque foi.</span>
+        </div>
+      </div>
+
+      <!-- PLANOS -->
+      <span class="modal-section-label">Planos de entrega</span>
+      <div class="modal-plans">
+        <div class="modal-plan">
+          <span class="plan-badge">Plano Autônomo</span>
+          <div class="plan-name">Código-fonte</div>
+          <div class="plan-price">R$ <strong>50.000</strong></div>
+          <span class="plan-recurrence">Pagamento único · sem mensalidade</span>
+          <div class="plan-divider"></div>
+          <ul class="plan-items">
+            <li>Repositório completo entregue</li>
+            <li>Supabase configurado no seu e-mail</li>
+            <li>Você hospeda onde quiser</li>
+            <li>White label incluso</li>
+            <li>Setup de hospedagem opcional (+R$ 400)</li>
+          </ul>
+        </div>
+        <div class="modal-plan featured">
+          <span class="plan-badge">Plano Hospedado</span>
+          <div class="plan-name">Sistema no ar</div>
+          <div class="plan-price">R$ <strong>50.000</strong> + <strong>260</strong><span style="font-size:13px">/mês</span></div>
+          <span class="plan-recurrence">Pagamento único + mensalidade de hospedagem</span>
+          <div class="plan-divider"></div>
+          <ul class="plan-items">
+            <li>Sistema no ar em cliente.eixoai.com.br</li>
+            <li>Infraestrutura gerenciada pela Eixo</li>
+            <li>Domínio próprio opcional (+R$ 400/ano)</li>
+            <li>White label incluso</li>
+            <li>Zero necessidade técnica da sua parte</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <a href="mailto:contato@eixoai.com?subject=Interesse no nexi.frota&body=Olá, tenho interesse no sistema nexi.frota. Gostaria de conhecer melhor e iniciar o trial de 7 dias." class="modal-buy">
+        Quero começar o trial de 7 dias gratuito →
+      </a>
+      <div class="trial-note">7 dias gratuitos · sem cartão · cancela quando quiser</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>EI<span style="color: var(--accent)">X</span>O · Studio de tecnologia com IA aplicada</span>
+  <a href="mailto:contato@eixoai.com">contato@eixoai.com</a>
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.textContent = isDark ? 'DARK' : 'LIGHT';
+  });
+}
+
+function openModal(id) {
+  const overlay = document.getElementById('modal-' + id);
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  const overlay = document.getElementById('modal-' + id);
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+      m.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
+</script>
+</body>
+</html>
