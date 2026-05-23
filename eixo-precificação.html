@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIXO · Precificação & Stack</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230A0A0A'/%3E%3Ctext x='50' y='72' text-anchor='middle' font-family='monospace' font-size='62' font-weight='700' fill='%23FF1493'%3EX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0A;
+  --fg: #F5F2EC;
+  --muted: #6B6661;
+  --line: #1F1D1A;
+  --accent: #FF1493;
+  --accent-dim: #B30E68;
+  --ink: #0A0A0A;
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+[data-theme="light"] {
+  --bg: #F5F2EC;
+  --fg: #0A0A0A;
+  --muted: #6B6661;
+  --line: #E0DCD2;
+  --accent: #D6196F;
+  --accent-dim: #9C0F4E;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Fraunces', Georgia, serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* NAV */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 18px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  transition: background 0.4s;
+}
+[data-theme="light"] .nav { background: rgba(245,242,236,0.9); }
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--fg);
+}
+.nav-logo .x { color: var(--accent); }
+.nav-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--line);
+}
+.nav-tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  transition: all 0.2s;
+  border-right: 1px solid var(--line);
+}
+.nav-tab:last-child { border-right: none; }
+.nav-tab:hover { color: var(--fg); background: var(--line); }
+.nav-tab.active { background: var(--accent); color: var(--ink); font-weight: 700; }
+.nav-actions { display: flex; gap: 16px; align-items: center; }
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* PAGES */
+.page { display: none; padding-top: 80px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* PAGE HERO */
+.page-hero {
+  padding: 80px 40px 60px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.page-hero-bg {
+  position: absolute;
+  top: 50%; right: -80px;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 320px;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0.04;
+  line-height: 0.8;
+  pointer-events: none;
+  user-select: none;
+}
+.page-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 20px;
+}
+.page-title em { font-style: italic; color: var(--accent); font-weight: 400; }
+.page-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 600px;
+  letter-spacing: 0.02em;
+}
+
+/* CUSTO MENSAL STRIP */
+.custo-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.custo-item {
+  background: var(--bg);
+  padding: 24px 32px;
+}
+.custo-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.custo-val {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.custo-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* STACK SECTION */
+.stack-section {
+  padding: 60px 40px;
+  border-bottom: 1px solid var(--line);
+}
+.stack-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stack-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.stack-card {
+  background: var(--bg);
+  padding: 36px 32px;
+  transition: background 0.2s;
+}
+.stack-card:hover { background: #111110; }
+[data-theme="light"] .stack-card:hover { background: #EDEAE4; }
+.stack-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.stack-icon {
+  width: 48px;
+  height: 48px;
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stack-icon img { width: 26px; height: 26px; }
+.stack-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.stack-tag.pago { border-color: var(--accent); color: var(--accent); }
+.stack-tag.gratis { border-color: #1a7a1a; color: #4CAF50; }
+.stack-tag.pago-uso { border-color: #7a5a00; color: #c4971a; }
+.stack-name {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.stack-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.stack-desc {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.stack-details {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stack-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.stack-detail-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.stack-detail-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--fg);
+  text-align: right;
+}
+
+/* PREÇOS */
+.preco-section {
+  padding: 60px 40px;
+  border-bottom: 1px solid var(--line);
+}
+.preco-formula {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-bottom: 60px;
+}
+.preco-formula-item {
+  background: var(--bg);
+  padding: 28px 32px;
+}
+.preco-formula-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.preco-formula-val {
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.cat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 20px 0 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #4CAF50; }
+.dot-amber { background: #c4971a; }
+.dot-red { background: var(--accent); }
+
+.preco-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  margin-bottom: 40px;
+}
+.preco-table thead tr { background: var(--line); }
+.preco-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 400;
+  border-right: 1px solid var(--bg);
+}
+.preco-table th:last-child { border-right: none; }
+.preco-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  vertical-align: top;
+}
+.preco-table td:last-child { border-right: none; }
+.preco-table tr:last-child td { border-bottom: none; }
+.preco-table tr { transition: background 0.15s; }
+.preco-table tr:hover td { background: #111110; }
+[data-theme="light"] .preco-table tr:hover td { background: #EDEAE4; }
+
+.td-name {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.td-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+.td-tempo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.badge-complexidade {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid;
+  display: inline-block;
+  white-space: nowrap;
+}
+.badge-baixa { border-color: #1a7a1a; color: #4CAF50; }
+.badge-media { border-color: #7a5a00; color: #c4971a; }
+.badge-alta { border-color: var(--accent-dim); color: var(--accent); }
+.td-incluso {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #4CAF50;
+  font-weight: 700;
+}
+.td-preco {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.nota {
+  background: var(--line);
+  border-left: 3px solid var(--accent);
+  padding: 20px 24px;
+  margin-top: 40px;
+}
+.nota p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+.nota strong { color: var(--fg); }
+
+.doc-footer {
+  padding: 40px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.doc-footer-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+.doc-footer-logo .x { color: var(--accent); }
+.doc-footer-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+}
+
+.nav-tabs-mobile { display: none; }
+
+@media (max-width: 768px) {
+  .nav { padding: 14px 20px; }
+  .nav-tabs { display: none; }
+  .nav-tabs-mobile {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 200;
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .nav-tab-mobile {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .nav-tab-mobile.active { color: var(--accent); }
+  .page { padding-bottom: 60px; }
+  .page-hero { padding: 60px 20px 40px; }
+  .stack-section, .preco-section { padding: 40px 20px; }
+  .preco-formula { grid-template-columns: 1fr; }
+  .stack-grid { grid-template-columns: 1fr; }
+  .custo-strip { grid-template-columns: 1fr 1fr; }
+  .preco-table th:nth-child(3), .preco-table td:nth-child(3) { display: none; }
+  .doc-footer { padding: 30px 20px; flex-direction: column; gap: 16px; text-align: center; }
+  .doc-footer-meta { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">[EI<span class="x">X</span>O]</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('stack', this)">01 · Stack</button>
+    <button class="nav-tab" onclick="showPage('precos', this)">02 · Precificação</button>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">LIGHT</button>
+  </div>
+</nav>
+
+<div class="nav-tabs-mobile">
+  <button class="nav-tab-mobile active" onclick="showPage('stack', this, true)">01 · Stack</button>
+  <button class="nav-tab-mobile" onclick="showPage('precos', this, true)">02 · Precificação</button>
+</div>
+
+<!-- ===================== PAGE 1: STACK ===================== -->
+<div class="page active" id="page-stack">
+
+  <div class="page-hero">
+    <div class="page-hero-bg">S</div>
+    <div class="page-label">// 01 · STACK TÉCNICA</div>
+    <h1 class="page-title">As ferramentas que<br><em>constroem</em>.</h1>
+    <p class="page-sub">Cada ferramenta escolhida com intenção. Stack enxuta, de baixo custo inicial e pronta para escalar conforme o volume crescer.</p>
+  </div>
+
+  <div class="custo-strip">
+    <div class="custo-item">
+      <div class="custo-label">→ Custo mínimo mensal</div>
+      <div class="custo-val">R$ 720</div>
+      <div class="custo-sub">Lovable + Claude Max 5x</div>
+    </div>
+    <div class="custo-item">
+      <div class="custo-label">→ Custo operacional estimado</div>
+      <div class="custo-val">R$ 1.300–2.000</div>
+      <div class="custo-sub">Com Vercel, Supabase, Resend e APIs</div>
+    </div>
+    <div class="custo-item">
+      <div class="custo-label">→ Por cliente hospedado</div>
+      <div class="custo-val">~R$ 130</div>
+      <div class="custo-sub">Supabase Pro por projeto</div>
+    </div>
+    <div class="custo-item">
+      <div class="custo-label">→ Faturamos por cliente</div>
+      <div class="custo-val">R$ 260/mês</div>
+      <div class="custo-sub">Margem de 100% sobre infra</div>
+    </div>
+  </div>
+
+  <!-- DESENVOLVIMENTO -->
+  <div class="stack-section">
+    <div class="stack-section-label">→ Desenvolvimento & IA</div>
+    <div class="stack-grid">
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/lovable.svg" onerror="this.style.display='none'" style="filter:invert(1);" alt="Lovable"></div>
+          <span class="stack-tag pago">Pago</span>
+        </div>
+        <div class="stack-name">Lovable</div>
+        <div class="stack-role">Prototipação & Validação</div>
+        <div class="stack-desc">Plataforma de desenvolvimento com IA. Usada para iterar rápido na fase de validação — do zero ao produto funcional em horas. Interface visual que gera código React real.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Quando usar</span><span class="stack-detail-val">Trial · MVP · Protótipo</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Custo</span><span class="stack-detail-val">R$ 120–300/mês</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Migrar para</span><span class="stack-detail-val">Claude Code após validação</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/anthropic.svg" onerror="this.style.display='none'" style="filter:invert(0.8) sepia(1) saturate(5) hue-rotate(290deg);" alt="Claude Code"></div>
+          <span class="stack-tag pago">Pago</span>
+        </div>
+        <div class="stack-name">Claude Code</div>
+        <div class="stack-role">Desenvolvimento em Produção</div>
+        <div class="stack-desc">CLI da Anthropic para desenvolvimento agentic com IA. Usado após validação no Lovable — mais robusto, controle total do código, repositório entregável ao cliente.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Quando usar</span><span class="stack-detail-val">Pós-venda · Entrega final</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Custo</span><span class="stack-detail-val">Incluso no plano Max</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Diferencial</span><span class="stack-detail-val">Código limpo e entregável</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/anthropic.svg" onerror="this.style.display='none'" style="filter:invert(0.8) sepia(1) saturate(5) hue-rotate(290deg);" alt="Claude AI"></div>
+          <span class="stack-tag pago">Pago</span>
+        </div>
+        <div class="stack-name">Claude AI</div>
+        <div class="stack-role">Assistência & Automação</div>
+        <div class="stack-desc">Interface principal de trabalho para geração de código, documentação, análise e criação de prompts. Backbone cognitivo do studio — onde as ideias viram instruções técnicas.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Plano</span><span class="stack-detail-val">Max 5x / Max 20x</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Custo</span><span class="stack-detail-val">R$ 600–1.200/mês por usuário</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Uso</span><span class="stack-detail-val">Diário · Todo projeto</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/googlegemini.svg" onerror="this.style.display='none'" style="filter:invert(0.6) sepia(1) saturate(4) hue-rotate(180deg);" alt="Gemini"></div>
+          <span class="stack-tag pago-uso">Por uso</span>
+        </div>
+        <div class="stack-name">API Gemini</div>
+        <div class="stack-role">IA dentro dos produtos</div>
+        <div class="stack-desc">API do Google para recursos de IA dentro dos sistemas entregues — quando o cliente precisa de funcionalidades como análise de documentos, sumarização ou geração de conteúdo no produto.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Quando usar</span><span class="stack-detail-val">Features de IA no produto</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Custo</span><span class="stack-detail-val">Por token consumido</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Free tier</span><span class="stack-detail-val">Disponível para testes</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INFRA -->
+  <div class="stack-section">
+    <div class="stack-section-label">→ Infraestrutura & Banco de Dados</div>
+    <div class="stack-grid">
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/supabase.svg" onerror="this.style.display='none'" style="filter:invert(0.5) sepia(1) saturate(5) hue-rotate(100deg);" alt="Supabase"></div>
+          <span class="stack-tag gratis">Free tier</span>
+        </div>
+        <div class="stack-name">Supabase</div>
+        <div class="stack-role">Banco de Dados & Auth</div>
+        <div class="stack-desc">Backend como serviço baseado em PostgreSQL. Cada cliente tem seu próprio projeto Supabase — banco isolado, autenticação, Row Level Security e storage. Escalável conforme o cliente cresce.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Modelo</span><span class="stack-detail-val">1 projeto por cliente</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Free tier</span><span class="stack-detail-val">Até 500MB · 50k usuários</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Pro</span><span class="stack-detail-val">R$ 130/mês por projeto</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/vercel.svg" onerror="this.style.display='none'" style="filter:invert(1);" alt="Vercel"></div>
+          <span class="stack-tag gratis">Free tier</span>
+        </div>
+        <div class="stack-name">Vercel</div>
+        <div class="stack-role">Hosting & Deploy</div>
+        <div class="stack-desc">Frontend e Serverless Functions hospedados no Vercel. Cada cliente do Plano Hospedado recebe um subdomínio próprio. Deploy automático a cada commit, preview por branch e escala sem configuração.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Subdomínios</span><span class="stack-detail-val">cliente.eixoai.com.br</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Banda</span><span class="stack-detail-val">100GB grátis/mês</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Deploy</span><span class="stack-detail-val">Ilimitado no free tier</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" onerror="this.style.display='none'" style="filter:invert(1);" alt="GitHub"></div>
+          <span class="stack-tag gratis">Free</span>
+        </div>
+        <div class="stack-name">GitHub</div>
+        <div class="stack-role">Repositório & Versionamento</div>
+        <div class="stack-desc">Organização Eixo no GitHub com o repositório base dos produtos. Cada cliente do Plano Autônomo recebe um fork privado com o código-fonte limpo, logo e variáveis configuradas.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Modelo</span><span class="stack-detail-val">Org Eixo + forks por cliente</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Privados</span><span class="stack-detail-val">Gratuito ilimitado</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Futuro</span><span class="stack-detail-val">GitHub Actions p/ automação</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COMERCIAL -->
+  <div class="stack-section">
+    <div class="stack-section-label">→ Comercial & Comunicação</div>
+    <div class="stack-grid">
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/stripe.svg" onerror="this.style.display='none'" style="filter:invert(0.5) sepia(1) saturate(5) hue-rotate(200deg);" alt="Stripe"></div>
+          <span class="stack-tag pago-uso">Por uso</span>
+        </div>
+        <div class="stack-name">Stripe</div>
+        <div class="stack-role">Pagamentos & Assinaturas</div>
+        <div class="stack-desc">Processamento de pagamentos para compras dos sistemas e mensalidades do Plano Hospedado. Checkout seguro, recorrência automática e painel de gestão financeira simples.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Taxa</span><span class="stack-detail-val">2,9% + R$ 1,00 / transação</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Recorrência</span><span class="stack-detail-val">Automática · Plano Hospedado</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Setup</span><span class="stack-detail-val">Gratuito</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/resend.svg" onerror="this.style.display='none'" style="filter:invert(1);" alt="Resend"></div>
+          <span class="stack-tag gratis">Free tier</span>
+        </div>
+        <div class="stack-name">Resend</div>
+        <div class="stack-role">E-mail Transacional</div>
+        <div class="stack-desc">Envio de e-mails transacionais — confirmação de compra, credenciais de acesso, notificações de sistema. API simples, entrega confiável e logs detalhados de cada envio.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Free tier</span><span class="stack-detail-val">3.000 e-mails/mês</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Pro</span><span class="stack-detail-val">R$ 120/mês · 50k e-mails</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Uso</span><span class="stack-detail-val">Compra · Entrega · Alertas</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-top">
+          <div class="stack-icon"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" onerror="this.style.display='none'" style="filter:invert(0.5) sepia(1) saturate(5) hue-rotate(80deg);" alt="WhatsApp"></div>
+          <span class="stack-tag pago-uso">Por uso</span>
+        </div>
+        <div class="stack-name">API Meta (WhatsApp)</div>
+        <div class="stack-role">Notificações via WhatsApp</div>
+        <div class="stack-desc">API oficial do WhatsApp Business para envio de notificações automáticas dentro dos sistemas. Cada cliente usa sua própria chave de API — número e conta são do cliente, não da Eixo.</div>
+        <div class="stack-details">
+          <div class="stack-detail-row"><span class="stack-detail-label">Modelo</span><span class="stack-detail-val">API por cliente</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Free tier</span><span class="stack-detail-val">1.000 conversas/mês</span></div>
+          <div class="stack-detail-row"><span class="stack-detail-label">Setup</span><span class="stack-detail-val">Serviço avulso Eixo</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-logo">[EI<span class="x">X</span>O]</div>
+    <div class="doc-footer-meta">Stack · Documento interno<br>Eixo Studio · 2026</div>
+  </footer>
+</div>
+
+<!-- ===================== PAGE 2: PREÇOS ===================== -->
+<div class="page" id="page-precos">
+
+  <div class="page-hero">
+    <div class="page-hero-bg">R$</div>
+    <div class="page-label">// 02 · PRECIFICAÇÃO</div>
+    <h1 class="page-title">O que cobramos<br>e <em>por quê</em>.</h1>
+    <p class="page-sub">Referência interna para precificação de melhorias e serviços avulsos. Baseada em R$ 200/h com 30% de margem de segurança, ajustada para desenvolvimento com IA.</p>
+  </div>
+
+  <div class="preco-section">
+
+    <div class="preco-formula">
+      <div class="preco-formula-item">
+        <div class="preco-formula-label">→ Taxa horária base</div>
+        <div class="preco-formula-val">R$ 200/h</div>
+      </div>
+      <div class="preco-formula-item">
+        <div class="preco-formula-label">→ Margem de segurança</div>
+        <div class="preco-formula-val">+ 30%</div>
+      </div>
+      <div class="preco-formula-item">
+        <div class="preco-formula-label">→ Fórmula</div>
+        <div class="preco-formula-val" style="font-size:20px;padding-top:6px;">horas × R$200 × 1,3</div>
+      </div>
+    </div>
+
+    <!-- PERSONALIZAÇÃO -->
+    <div class="cat-label"><span class="dot dot-green"></span>Personalização & entrega</div>
+    <table class="preco-table">
+      <thead><tr>
+        <th style="width:40%">Serviço</th>
+        <th>Tempo estimado</th>
+        <th>Complexidade</th>
+        <th>Valor</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="td-name">Troca de logo e cores</div><div class="td-sub">Identidade visual do cliente aplicada ao sistema</div></td>
+          <td><span class="td-tempo">15–30 min</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-incluso">✓ Incluso</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Setup de hospedagem + domínio</div><div class="td-sub">Deploy no Vercel, configuração de DNS e subdomínio</div></td>
+          <td><span class="td-tempo">30–60 min</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 400</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Setup da API do WhatsApp</div><div class="td-sub">Configuração completa no Meta for Developers + ativação</div></td>
+          <td><span class="td-tempo">1–2h</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 400</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SIMPLES -->
+    <div class="cat-label" style="margin-top:32px;"><span class="dot dot-green"></span>Funcionalidades novas — simples</div>
+    <table class="preco-table">
+      <thead><tr>
+        <th style="width:40%">Funcionalidade</th>
+        <th>Tempo estimado</th>
+        <th>Complexidade</th>
+        <th>Valor</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="td-name">Novo campo ou etapa no fluxo</div><div class="td-sub">Ex: adicionar campo de km, nova etapa de aprovação</div></td>
+          <td><span class="td-tempo">30–60 min</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 400</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Ajuste de template de mensagem</div><div class="td-sub">Ex: novo fluxo de notificação WhatsApp por etapa</div></td>
+          <td><span class="td-tempo">30–45 min</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 400</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Novo relatório ou filtro</div><div class="td-sub">Ex: relatório por período, filtro por tipo de veículo</div></td>
+          <td><span class="td-tempo">1–2h</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 400</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Tela nova simples</div><div class="td-sub">Ex: página de histórico, tela de configurações básica</div></td>
+          <td><span class="td-tempo">1–3h</span></td>
+          <td><span class="badge-complexidade badge-baixa">Baixa</span></td>
+          <td><span class="td-preco">R$ 500</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- MÉDIAS -->
+    <div class="cat-label" style="margin-top:32px;"><span class="dot dot-amber"></span>Funcionalidades novas — médias</div>
+    <table class="preco-table">
+      <thead><tr>
+        <th style="width:40%">Funcionalidade</th>
+        <th>Tempo estimado</th>
+        <th>Complexidade</th>
+        <th>Valor</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="td-name">Dashboard com indicadores</div><div class="td-sub">Ex: gráficos de SLA, tempo médio por etapa, volume</div></td>
+          <td><span class="td-tempo">2–4h</span></td>
+          <td><span class="badge-complexidade badge-media">Média</span></td>
+          <td><span class="td-preco">R$ 800</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Integração com sistema externo</div><div class="td-sub">Ex: ERP, sistema de manutenção, planilha Google</div></td>
+          <td><span class="td-tempo">3–6h</span></td>
+          <td><span class="badge-complexidade badge-media">Média</span></td>
+          <td><span class="td-preco">R$ 1.150</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">App mobile — visualização</div><div class="td-sub">Ex: motorista acompanhar status do veículo em tempo real</div></td>
+          <td><span class="td-tempo">4–8h</span></td>
+          <td><span class="badge-complexidade badge-media">Média</span></td>
+          <td><span class="td-preco">R$ 1.550</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Gestão de usuários e permissões</div><div class="td-sub">Ex: roles admin/operador, convite por e-mail, controle de acesso</div></td>
+          <td><span class="td-tempo">3–6h</span></td>
+          <td><span class="badge-complexidade badge-media">Média</span></td>
+          <td><span class="td-preco">R$ 1.150</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- COMPLEXAS -->
+    <div class="cat-label" style="margin-top:32px;"><span class="dot dot-red"></span>Funcionalidades novas — complexas</div>
+    <table class="preco-table">
+      <thead><tr>
+        <th style="width:40%">Funcionalidade</th>
+        <th>Tempo estimado</th>
+        <th>Complexidade</th>
+        <th>Valor</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="td-name">Módulo novo completo</div><div class="td-sub">Ex: módulo de combustível, multas, manutenção preventiva</div></td>
+          <td><span class="td-tempo">8–16h</span></td>
+          <td><span class="badge-complexidade badge-alta">Alta</span></td>
+          <td><span class="td-preco">R$ 3.100</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Automação com IA no produto</div><div class="td-sub">Ex: predição de manutenção, análise de rota, sumarização com LLM</div></td>
+          <td><span class="td-tempo">10–20h</span></td>
+          <td><span class="badge-complexidade badge-alta">Alta</span></td>
+          <td><span class="td-preco">R$ 3.900</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Refatoração ou migração técnica</div><div class="td-sub">Ex: migração do Lovable para Claude Code, troca de banco</div></td>
+          <td><span class="td-tempo">10–30h</span></td>
+          <td><span class="badge-complexidade badge-alta">Alta</span></td>
+          <td><span class="td-preco">R$ 5.200</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SUPORTE -->
+    <div class="cat-label" style="margin-top:32px;"><span class="dot dot-green"></span>Suporte & serviços recorrentes</div>
+    <table class="preco-table">
+      <thead><tr>
+        <th style="width:40%">Serviço</th>
+        <th>Duração</th>
+        <th>O que inclui</th>
+        <th>Valor</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="td-name">Suporte técnico</div><div class="td-sub">Correção de bugs e dúvidas técnicas, sem limite de chamados</div></td>
+          <td><span class="td-tempo">6 meses</span></td>
+          <td><span class="td-sub">Bugs · Dúvidas · Ajustes mínimos</span></td>
+          <td><span class="td-preco">R$ 6.000</span></td>
+        </tr>
+        <tr>
+          <td><div class="td-name">Mensalidade de hospedagem</div><div class="td-sub">Sistema no ar com subdomínio, banco e infraestrutura gerenciada</div></td>
+          <td><span class="td-tempo">Mensal</span></td>
+          <td><span class="td-sub">Vercel + Supabase + monitoramento</span></td>
+          <td><span class="td-preco">R$ 260/mês</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="nota">
+      <p>
+        <strong>Importante:</strong> os tempos acima são estimativas com desenvolvimento via IA (Lovable / Claude Code). O valor cobrado não precisa refletir apenas as horas — o cliente paga pelo resultado e pela expertise em transformar o problema em solução. Use as faixas como <strong>piso</strong>, não como teto.<br><br>
+        Conforme os primeiros projetos forem entregues, atualize essa tabela com os tempos reais observados.
+      </p>
+    </div>
+
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-logo">[EI<span class="x">X</span>O]</div>
+    <div class="doc-footer-meta">Precificação · Documento interno<br>Eixo Studio · 2026</div>
+  </footer>
+</div>
+
+<script>
+function showPage(page, btn, isMobile) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-tab, .nav-tab-mobile').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const idx = page === 'stack' ? 1 : 2;
+  const twin = isMobile
+    ? document.querySelector('.nav-tabs .nav-tab:nth-child(' + idx + ')')
+    : document.querySelector('.nav-tabs-mobile .nav-tab-mobile:nth-child(' + idx + ')');
+  if (twin) twin.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'dark' ? 'LIGHT' : 'DARK';
+}
+</script>
+</body>
+</html>
