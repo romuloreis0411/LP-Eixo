@@ -745,12 +745,12 @@ footer a:hover { color: var(--accent); }
 <body>
 
 <!-- NAV -->
-<nav class="nav">
+<nav class="nav" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;">
   <div class="nav-logo">[EI<span class="x">X</span>O]</div>
-  <div class="nav-actions">
+  <a href="/produtos.html" style="background: var(--accent); color: var(--ink) !important; padding: 10px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none;">PRODUTOS</a>
+  <div class="nav-actions" style="justify-content: flex-end;">
     <a href="/precos.html">Preços</a>
-<a href="/produtos.html" style="background: var(--accent); color: var(--ink) !important; padding: 8px 16px; font-weight: 700; border: 2px solid var(--accent); letter-spacing: 0.15em;">Produtos</a>
-<a href="#sobre">Sobre</a>
+    <a href="#sobre">Sobre</a>
     <a href="#metodo">Método</a>
     <a href="#time">Time</a>
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">LIGHT</button>
